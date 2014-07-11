@@ -25,6 +25,20 @@ module RainforestRubyRuntime
           subject[:status].must_equal "passed"
         end
       end
+
+      describe "a spec raising a runtime error" do
+        let(:code) { "raise 'foo'" }
+        it "returns an 'error'" do
+          subject[:status].must_equal "error"
+        end
+      end
+
+      describe "a spec with syntax error" do
+        let(:code) { "if if true; puts true; end;" }
+        it "returns an 'fatal_error'" do
+          subject[:status].must_equal "fatal_error"
+        end
+      end
     end
   end
 end

@@ -20,16 +20,26 @@ module RainforestRubyRuntime
       begin
         run(code)
       rescue RSpec::Expectations::ExpectationNotMetError => e
-        return {
-          exception: e.class.to_s,
-          message: e.message,
-          status: 'failed',
-        }
+        return exception_to_payload e, status: 'failed'
+      rescue RuntimeError => e
+        return exception_to_payload e, status: 'error'
+      rescue Exception => e
+        return exception_to_payload e, status: 'fatal_error'
       end
 
       {
         status: 'passed'
       }
+    end
+
+    private
+    def self.exception_to_payload(e, status: )
+      {
+          exception: e.class.to_s,
+          message: e.message,
+          status: status,
+        }
+
     end
   end
 end
