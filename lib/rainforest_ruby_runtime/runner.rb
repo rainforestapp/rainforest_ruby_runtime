@@ -15,5 +15,21 @@ module RainforestRubyRuntime
 
       eval code
     end
+
+    def self.extract_results(code)
+      begin
+        run(code)
+      rescue RSpec::Expectations::ExpectationNotMetError => e
+        return {
+          exception: e.class.to_s,
+          message: e.message,
+          status: 'failed',
+        }
+      end
+
+      {
+        status: 'passed'
+      }
+    end
   end
 end
