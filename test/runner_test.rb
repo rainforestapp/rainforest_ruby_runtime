@@ -2,14 +2,27 @@ require_relative './test_helper'
 
 module RainforestRubyRuntime
   describe Runner do
-    describe ".run" do
+    subject { Runner.new }
+
+    describe "#run" do
       it "runs the code and return the results" do
-        Runner.run(":expected").must_equal :expected
+        subject.run(":expected").must_equal :expected
+      end
+
+      describe "with a limited browser set" do
+        subject { Runner.new browsers: %w(chrome) }
+
+        it "applies the correct configuration" do
+          subject.stub(:driver, 'sauce') do
+            subject.run("code")
+            Sauce.get_config.browsers.must_equal [["Windows 7", "Chrome", "35"]]
+          end
+        end
       end
     end
 
-    describe ".extract_results" do
-      subject { Runner.extract_results(code) }
+    describe "#extract_results" do
+      subject { Runner.new.extract_results(code) }
 
       describe "a failing spec" do
         let(:code) { "expect(1).to eq(2)" }
