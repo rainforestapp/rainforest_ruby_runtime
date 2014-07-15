@@ -43,11 +43,10 @@ module RainforestRubyRuntime
     private
     def exception_to_payload(e, status: )
       {
-          exception: e.class.to_s,
-          message: e.message,
-          status: status,
-        }
-
+        exception: e.class.to_s,
+        message: e.message,
+        status: status,
+      }
     end
 
     def apply_config!
