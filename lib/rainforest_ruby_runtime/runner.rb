@@ -16,6 +16,8 @@ module RainforestRubyRuntime
       apply_config!
 
       eval code
+    ensure
+      terminate_session!
     end
 
     def extract_results(code)
@@ -55,6 +57,12 @@ module RainforestRubyRuntime
       }.fetch(driver)
 
       config.new(config_options).call
+    end
+
+    def terminate_session!
+      current_driver = Capybara.current_session.driver
+      # Terminate the Sauce session if needed
+      current_driver.finish! if current_driver.respond_to?(:finish!)
     end
   end
 end
