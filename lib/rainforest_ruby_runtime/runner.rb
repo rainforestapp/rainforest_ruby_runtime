@@ -7,15 +7,19 @@ module RainforestRubyRuntime
     end
 
     def run(code)
-      extend RSpec::Matchers
-      extend Capybara::DSL
-
+      extend RainforestRubyRuntime::DSL
       Capybara.default_driver = :"#{driver}"
       Capybara.default_wait_time = 20
 
       apply_config!
 
-      eval code
+      test = eval(code)
+      if Test === test
+        test.run
+      else
+        raise WrongReturnValueError, test
+      end
+      test
     ensure
       terminate_session!
     end
@@ -27,7 +31,7 @@ module RainforestRubyRuntime
         return exception_to_payload e, status: 'failed'
       rescue RuntimeError => e
         return exception_to_payload e, status: 'error'
-      rescue Exception => e
+      rescue SyntaxError, Exception => e
         return exception_to_payload e, status: 'fatal_error'
       end
 
