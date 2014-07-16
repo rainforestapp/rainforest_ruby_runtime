@@ -1,4 +1,4 @@
-# RainforestRubyRuntime
+# Rainforest Ruby Runtime
 
 TODO: Write a gem description
 
@@ -22,7 +22,7 @@ TODO: Write usage instructions here
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/rainforest_ruby_runtime/fork )
+1. Fork it ( https://github.com/rainforestapp/rainforest_ruby_runtime/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
