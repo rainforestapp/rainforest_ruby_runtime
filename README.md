@@ -1,5 +1,7 @@
 # Rainforest Ruby Runtime
 
+[![Build Status](https://travis-ci.org/rainforestapp/rainforest_ruby_runtime.svg)](https://travis-ci.org/rainforestapp/rainforest_ruby_runtime)
+
 TODO: Write a gem description
 
 ## Installation
