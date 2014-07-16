@@ -50,6 +50,7 @@ module RainforestRubyRuntime
         exception: e.class.to_s,
         message: e.message,
         status: status,
+        backtrace: e.backtrace,
       }
     end
 
