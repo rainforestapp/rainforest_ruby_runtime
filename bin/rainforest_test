@@ -3,4 +3,4 @@
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "../lib")
 require 'rainforest_ruby_runtime'
 
-RainforestRubyRuntime::Runner.new.run ARGF.read
+RainforestRubyRuntime::Runner.new(browsers: %w(firefox)).run ARGF.read
