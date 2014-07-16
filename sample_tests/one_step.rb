@@ -3,5 +3,3 @@ test(id: 1, title: 'One step') do
     #REPLACE
   end
 end
-
-

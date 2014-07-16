@@ -5,5 +5,3 @@ require 'rainforest_ruby_runtime'
 require 'minitest/spec'
 require 'minitest/autorun'
 require 'minitest/pride'
-
-
