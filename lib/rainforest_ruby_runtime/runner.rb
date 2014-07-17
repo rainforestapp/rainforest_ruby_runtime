@@ -9,7 +9,7 @@ module RainforestRubyRuntime
     def run(code)
       extend RainforestRubyRuntime::DSL
       Capybara.default_driver = :"#{driver}"
-      Capybara.default_wait_time = 20
+      Capybara.default_wait_time = wait_time
 
       apply_config!
 
@@ -67,6 +67,10 @@ module RainforestRubyRuntime
       current_driver = Capybara.current_session.driver
       # Terminate the Sauce session if needed
       current_driver.finish! if current_driver.respond_to?(:finish!)
+    end
+
+    def wait_time
+      ENV.fetch("CAPYBARA_WAIT_TIME", 20).to_i
     end
   end
 end
