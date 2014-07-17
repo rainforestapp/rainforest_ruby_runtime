@@ -24,25 +24,28 @@ module RainforestRubyRuntime
       terminate_session!
     end
 
-    def extract_results(code)
+    def extract_results(code, session_id: nil)
       stdout = stderr = nil
+      payload = nil
       begin
         stdout, stderr = capture_output2 do
           run(code)
         end
       rescue RSpec::Expectations::ExpectationNotMetError => e
-        return exception_to_payload e, status: 'failed', stdout: stdout, stderr: stderr
+        payload = exception_to_payload e, status: 'failed'
       rescue RuntimeError => e
-        return exception_to_payload e, status: 'error', stdout: stdout, stderr: stderr
+        payload = exception_to_payload e, status: 'error'
       rescue SyntaxError, Exception => e
-        return exception_to_payload e, status: 'fatal_error', stdout: stdout, stderr: stderr
+        payload = exception_to_payload e, status: 'fatal_error'
       end
 
-      {
-        status: 'passed',
+      payload ||= { status: 'passed' }
+
+      payload.merge({
         stdout: stdout,
         stderr: stderr,
-      }
+        session_id: session_id || self.session_id
+      })
     end
 
     def driver
@@ -67,14 +70,22 @@ module RainforestRubyRuntime
       config.new(config_options).call
     end
 
+
+    def current_driver
+      Capybara.current_session.driver
+    end
+
     def terminate_session!
-      current_driver = Capybara.current_session.driver
       # Terminate the Sauce session if needed
       current_driver.finish! if current_driver.respond_to?(:finish!)
     end
 
     def wait_time
       ENV.fetch("CAPYBARA_WAIT_TIME", 20).to_i
+    end
+
+    def session_id
+      current_driver.browser.session_id if current_driver.browser.respond_to?(:session_id)
     end
 
     def capture_output2
