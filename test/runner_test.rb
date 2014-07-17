@@ -61,6 +61,13 @@ module RainforestRubyRuntime
         end
       end
 
+      describe "a spec raising a selenium error" do
+        let(:code) { format_step "raise Selenium::WebDriver::Error::WebDriverError" }
+        it "returns an 'error'" do
+          subject[:status].must_equal "error"
+        end
+      end
+
       describe "a spec with syntax error" do
         let(:code) { format_step "if if true; puts true; end;" }
         it "returns an 'fatal_error'" do

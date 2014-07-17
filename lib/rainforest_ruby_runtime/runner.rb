@@ -33,7 +33,7 @@ module RainforestRubyRuntime
         end
       rescue RSpec::Expectations::ExpectationNotMetError => e
         payload = exception_to_payload e, status: 'failed'
-      rescue RuntimeError => e
+      rescue StandardError => e
         payload = exception_to_payload e, status: 'error'
       rescue SyntaxError, Exception => e
         payload = exception_to_payload e, status: 'fatal_error'
