@@ -34,6 +34,17 @@ module RainforestRubyRuntime
           end.must_raise(WrongReturnValueError)
         end
       end
+
+      describe "with custom step variables" do
+        let(:code) { read_sample "step_variables" }
+
+        it "makes the variable accessible in the test" do
+          subject.run(code)
+          $step_variable_1_was.wont_be_nil
+          $step_variable_2_was.must_match /time is: .*/
+          $step_variable_3_was.must_equal "1"
+        end
+      end
     end
 
     describe "#extract_results" do

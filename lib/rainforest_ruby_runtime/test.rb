@@ -21,6 +21,14 @@ module RainforestRubyRuntime
       extend Capybara::DSL
       instance_eval &@block
     end
+
+    def method_missing(name, *args, &block)
+      if Variables::SCOPE_REGISTRY.has_variable?(name)
+        Variables::SCOPE_REGISTRY[name]
+      else
+        super
+      end
+    end
   end
 
   class Step
