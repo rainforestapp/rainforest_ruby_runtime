@@ -25,18 +25,23 @@ module RainforestRubyRuntime
     end
 
     def extract_results(code)
+      stdout = stderr = nil
       begin
-        run(code)
+        stdout, stderr = capture_output2 do
+          run(code)
+        end
       rescue RSpec::Expectations::ExpectationNotMetError => e
-        return exception_to_payload e, status: 'failed'
+        return exception_to_payload e, status: 'failed', stdout: stdout, stderr: stderr
       rescue RuntimeError => e
-        return exception_to_payload e, status: 'error'
+        return exception_to_payload e, status: 'error', stdout: stdout, stderr: stderr
       rescue SyntaxError, Exception => e
-        return exception_to_payload e, status: 'fatal_error'
+        return exception_to_payload e, status: 'fatal_error', stdout: stdout, stderr: stderr
       end
 
       {
-        status: 'passed'
+        status: 'passed',
+        stdout: stdout,
+        stderr: stderr,
       }
     end
 
@@ -45,13 +50,12 @@ module RainforestRubyRuntime
     end
 
     private
-    def exception_to_payload(e, status: )
-      {
+    def exception_to_payload(e, payload = {})
+      payload.merge({
         exception: e.class.to_s,
         message: e.message,
-        status: status,
         backtrace: e.backtrace,
-      }
+      })
     end
 
     def apply_config!
@@ -71,6 +75,17 @@ module RainforestRubyRuntime
 
     def wait_time
       ENV.fetch("CAPYBARA_WAIT_TIME", 20).to_i
+    end
+
+    def capture_output2
+      previous_stdout, $stdout = $stdout, StringIO.new
+      previous_stderr, $stderr = $stderr, StringIO.new
+      yield
+      [$stdout.string, $stderr.string]
+    ensure
+      # Restore the previous value of stdout (typically equal to STDERR).
+      $stdout = previous_stdout
+      $stderr = previous_stderr
     end
   end
 end

@@ -67,6 +67,20 @@ module RainforestRubyRuntime
           subject[:status].must_equal "fatal_error"
         end
       end
+
+      describe "a tests that outputs to stdout" do
+        let(:code) { format_step "print 'hello'" }
+        it "captures it and adds it to the payload" do
+          subject[:stdout].must_equal "hello"
+        end
+      end
+
+      describe "a tests that errputs to stderr" do
+        let(:code) { format_step "$stderr.print 'hello'" }
+        it "captures it and adds it to the payload" do
+          subject[:stderr].must_equal "hello"
+        end
+      end
     end
 
     def read_sample(name)
