@@ -24,7 +24,7 @@ module RainforestRubyRuntime
       terminate_session!
     end
 
-    def extract_results(code, session_id: nil)
+    def extract_results(code, fake_session_id: nil)
       stdout = stderr = nil
       payload = nil
       begin
@@ -44,7 +44,7 @@ module RainforestRubyRuntime
       payload.merge({
         stdout: stdout,
         stderr: stderr,
-        session_id: session_id || self.session_id
+        session_id: fake_session_id || session_id
       })
     end
 
@@ -69,7 +69,6 @@ module RainforestRubyRuntime
 
       config.new(config_options).call
     end
-
 
     def current_driver
       Capybara.current_session.driver

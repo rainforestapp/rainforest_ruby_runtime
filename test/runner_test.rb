@@ -37,7 +37,7 @@ module RainforestRubyRuntime
     end
 
     describe "#extract_results" do
-      subject { Runner.new(session_id: :test).extract_results(code, session_id: :test) }
+      subject { Runner.new.extract_results(code, fake_session_id: :test) }
 
       describe "a failing spec" do
         let(:code) { format_step "expect(1).to eq(2)" }
