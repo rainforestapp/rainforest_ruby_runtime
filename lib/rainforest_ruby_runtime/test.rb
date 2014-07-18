@@ -23,8 +23,8 @@ module RainforestRubyRuntime
     end
 
     def method_missing(name, *args, &block)
-      if Variables::SCOPE_REGISTRY.has_variable?(name)
-        Variables::SCOPE_REGISTRY[name]
+      if Variables.scope_registery.has_variable?(name)
+        Variables.scope_registery[name]
       else
         super
       end

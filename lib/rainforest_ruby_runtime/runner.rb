@@ -4,6 +4,7 @@ module RainforestRubyRuntime
 
     def initialize(options = {})
       @config_options = options.dup.freeze
+      @step_variables = options[:step_variables]
     end
 
     def run(code)
@@ -12,6 +13,7 @@ module RainforestRubyRuntime
       Capybara.default_wait_time = wait_time
 
       apply_config!
+      setup_scope_registery!
 
       test = eval(code)
       if Test === test
@@ -96,6 +98,14 @@ module RainforestRubyRuntime
       # Restore the previous value of stdout (typically equal to STDERR).
       $stdout = previous_stdout
       $stderr = previous_stderr
+    end
+
+    def setup_scope_registery!
+      if @step_variables.nil?
+        Variables.scope_registery = Variables::Registery.new
+      else
+        Variables.scope_registery = Variables::StaticVariableRegistery.new(@step_variables)
+      end
     end
   end
 end

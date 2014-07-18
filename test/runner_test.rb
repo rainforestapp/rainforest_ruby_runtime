@@ -99,6 +99,33 @@ module RainforestRubyRuntime
           subject[:stderr].must_equal "hello"
         end
       end
+
+      describe "a test with predefined values for custom variables" do
+        let(:code) { read_sample "step_variables" }
+        let(:step_variables) do
+          {
+            "my_custom_scope" => {
+              "uuid" => "some_uuid",
+              "time" => "some_time",
+            },
+            "my_other_scope" => {
+              "constant" => "some_constant",
+            }
+          }
+        end
+        let(:runner) { Runner.new(step_variables: step_variables) }
+
+        subject do
+          runner.extract_results(code, fake_session_id: :test)
+        end
+
+        it "uses the passed in variables" do
+          subject[:status].must_equal "passed"
+          $step_variable_1_was.must_equal "some_uuid"
+          $step_variable_2_was.must_equal "some_time"
+          $step_variable_3_was.must_equal "some_constant"
+        end
+      end
     end
 
     def read_sample(name)

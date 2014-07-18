@@ -6,7 +6,7 @@ module RainforestRubyRuntime
       def initialize(*, &block)
         super
         @registry = Registery.new
-        instance_eval &block
+        instance_eval &block if block_given?
       end
 
       def define_variable(name, &block)

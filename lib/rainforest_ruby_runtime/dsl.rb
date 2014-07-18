@@ -6,7 +6,7 @@ module RainforestRubyRuntime
 
     def define_variable_scope(name, &block)
       scope = Variables::Scope.new(name, &block)
-      Variables::SCOPE_REGISTRY.register(scope)
+      Variables.scope_registery.register(scope)
     end
   end
 end
