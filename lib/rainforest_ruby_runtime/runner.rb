@@ -81,6 +81,8 @@ module RainforestRubyRuntime
     def terminate_session!
       # Terminate the Sauce session if needed
       current_driver.finish! if current_driver.respond_to?(:finish!)
+    rescue Selenium::WebDriver::Error::WebDriverError => e
+      # Ignore
     end
 
     def wait_time
