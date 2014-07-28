@@ -5,17 +5,19 @@ module RainforestRubyRuntime
     def initialize(options = {})
       @config_options = options.dup.freeze
       @step_variables = options[:step_variables]
+      @callback = NilDelegator.new(options.fetch(:callback) { Empty.new })
     end
 
     def run(code)
-      extend RainforestRubyRuntime::DSL
       Capybara.default_driver = :"#{driver}"
       Capybara.default_wait_time = wait_time
 
       apply_config!
       setup_scope_registery!
 
-      test = eval(code)
+      dsl = RainforestRubyRuntime::DSL.new(callback: @callback)
+
+      test = dsl.run_code(code)
       if Test === test
         test.run
       else
@@ -101,6 +103,7 @@ module RainforestRubyRuntime
     end
 
     def setup_scope_registery!
+      # TODO this should not be set globally, but passed in the DSL
       if @step_variables.nil?
         Variables.scope_registery = Variables::Registery.new
       else

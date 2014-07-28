@@ -128,6 +128,64 @@ module RainforestRubyRuntime
       end
     end
 
+    describe "callbacks" do
+      let(:callback) do
+        Class.new do
+          attr_reader :before_steps, :before_tests, :after_steps, :after_tests
+
+          def initialize
+            @before_steps = []
+            @after_steps = []
+            @after_tests = []
+            @before_tests = []
+          end
+
+          def before_step(step)
+            @before_steps << step
+          end
+
+          def after_step(step)
+            @after_steps << step
+          end
+
+          def after_test(test)
+            @after_tests << test
+          end
+
+          def before_test(test)
+            @before_tests << test
+          end
+        end.new
+      end
+
+      let(:code) { read_sample "two_steps" }
+      subject { Runner.new callback: callback }
+
+      it "calls the right method on the callback object" do
+        subject.run(code)
+        callback.before_tests.size.must_equal 1
+        callback.after_tests.size.must_equal 1
+        callback.before_steps.size.must_equal 2
+        callback.after_steps.size.must_equal 2
+
+        callback.before_steps.map(&:id).must_equal [1, 2]
+        callback.after_steps.map(&:id).must_equal [1, 2]
+
+        callback.before_steps.map(&:action).must_equal ["action 1", "action 2"]
+      end
+
+      describe "a partially define callback object" do
+        let(:callback) do
+          Class.new do
+          end.new
+        end
+
+        it "should not rise a method missing exception" do
+          subject.run(code)
+        end
+      end
+    end
+
     def read_sample(name)
       File.read(File.expand_path("../sample_tests/#{name}.rb", __dir__))
     end
