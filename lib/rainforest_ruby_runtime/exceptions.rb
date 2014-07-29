@@ -2,6 +2,9 @@ module RainforestRubyRuntime
   class Exception < RuntimeError
   end
 
+  class Timeout < RuntimeError
+  end
+
   class WrongReturnValueError < Exception
     attr_reader :returned_value
     def initialize(returned_value)
