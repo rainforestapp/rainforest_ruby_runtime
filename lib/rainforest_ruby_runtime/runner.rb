@@ -56,6 +56,10 @@ module RainforestRubyRuntime
       ENV.fetch("CAPYBARA_DRIVER") { "selenium" }
     end
 
+    def session_id
+      current_driver.browser.session_id if current_driver.browser.respond_to?(:session_id)
+    end
+
     private
     def exception_to_payload(e, payload = {})
       payload.merge({
@@ -87,10 +91,6 @@ module RainforestRubyRuntime
 
     def wait_time
       ENV.fetch("CAPYBARA_WAIT_TIME", 20).to_i
-    end
-
-    def session_id
-      current_driver.browser.session_id if current_driver.browser.respond_to?(:session_id)
     end
 
     def capture_output2
