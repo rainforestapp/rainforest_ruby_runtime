@@ -4,6 +4,14 @@ module RainforestRubyRuntime
   describe Runner do
     subject { Runner.new }
     let(:code) { read_sample "empty" }
+    
+    describe "#session_id" do
+      it "returns a session id" do
+        subject.stub(:current_driver, OpenStruct.new(browser: OpenStruct.new(session_id: 'session'))) do
+          subject.session_id.must_equal 'session' 
+        end
+      end
+    end
 
     describe "#run" do
       describe "with a limited browser set" do
