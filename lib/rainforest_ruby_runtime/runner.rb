@@ -55,9 +55,13 @@ module RainforestRubyRuntime
     def driver
       ENV.fetch("CAPYBARA_DRIVER") { "selenium" }
     end
+    
+    def current_browser
+      current_driver.browser
+    end
 
     def session_id
-      current_driver.browser.session_id if current_driver.browser.respond_to?(:session_id)
+      current_browser.session_id if current_driver.browser.respond_to?(:session_id)
     end
 
     private
