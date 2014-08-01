@@ -1,14 +1,16 @@
 module RainforestRubyRuntime
   class Runner
-    attr_reader :config_options
+    attr_reader :config_options, :logger
 
     def initialize(options = {})
       @config_options = options.dup.freeze
       @step_variables = options[:step_variables]
       @callback = NilDelegator.new(options.fetch(:callback) { Empty.new })
+      @logger = options.fetch(:logger) { Logger.new(StringIO.new) }
     end
 
     def run(code)
+      logger.debug "Running code:\n#{code}\nDriver: #{driver}"
       Capybara.default_driver = :"#{driver}"
       Capybara.default_wait_time = wait_time
 
@@ -45,17 +47,26 @@ module RainforestRubyRuntime
 
       payload ||= { status: 'passed' }
 
-      payload.merge({
+      sid = fake_session_id || session_id
+
+      payload = payload.merge({
         stdout: stdout,
         stderr: stderr,
-        session_id: fake_session_id || session_id
+        session_id: sid,
+        driver: driver,
       })
+
+
+      logger.debug("Payload")
+      logger.debug(payload.inspect)
+
+      payload
     end
 
     def driver
       ENV.fetch("CAPYBARA_DRIVER") { "selenium" }
     end
-    
+
     def current_browser
       current_driver.browser
     end
@@ -90,9 +101,15 @@ module RainforestRubyRuntime
 
     def terminate_session!
       # Terminate the Sauce session if needed
-      current_driver.finish! if current_driver.respond_to?(:finish!)
+      if current_driver.respond_to?(:finish!)
+        current_driver.finish!
+      else
+        logger.warn "Cannot terminate session. Driver #{driver}"
+      end
     rescue Selenium::WebDriver::Error::WebDriverError => e
       # Ignore
+      logger.warn "Exception while terminating session. Driver #{driver}. Class: #{e.class}"
+      logger.warn "#{e.message}\n#{e.backtrace.join("\n")}"
     end
 
     def wait_time
