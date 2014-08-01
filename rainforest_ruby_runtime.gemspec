@@ -23,5 +23,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "sauce", "~> 3.4"
   spec.add_dependency "sauce-connect", "~> 3.4"
   spec.add_dependency "rspec-expectations", "~> 3.0"
-  spec.add_dependency 'capybara', "~> 2.4"
+  spec.add_dependency "capybara", "~> 2.4"
+  spec.add_dependency "testingbot", "~> 0.1.5"
 end
