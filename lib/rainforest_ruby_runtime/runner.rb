@@ -73,6 +73,10 @@ module RainforestRubyRuntime
 
     def session_id
       current_browser.session_id if current_driver.browser.respond_to?(:session_id)
+    rescue Selenium::WebDriver::Error::WebDriverError => e
+      logger.error "Can't retrieve session id"
+      logger.error "#{e.class} #{e.message}\n#{e.backtrace.join("\n")}"
+      nil
     end
 
     private
@@ -103,9 +107,12 @@ module RainforestRubyRuntime
       # Terminate the Sauce session if needed
       if current_driver.respond_to?(:finish!)
         current_driver.finish!
+      elsif current_driver.respond_to?(:quit)
+        current_driver.quit
       else
-        logger.warn "Cannot terminate session. Driver #{driver}"
+        logger.warn "Cannot terminate session. Driver #{driver}" and return
       end
+      logger.debug "Session successfuly terminated"
     rescue Selenium::WebDriver::Error::WebDriverError => e
       # Ignore
       logger.warn "Exception while terminating session. Driver #{driver}. Class: #{e.class}"
