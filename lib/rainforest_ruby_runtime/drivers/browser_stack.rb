@@ -28,7 +28,7 @@ module RainforestRubyRuntime
             "ie9" => {platform: "WINDOWS", browser: "internet explorer", browser_version: 9},
             "ie10" => {platform: "WINDOWS", browser: "internet explorer", browser_version: 10},
             "ie11" => {platform: "WINDOWS", browser: "internet explorer", browser_version: 11},
-            "chrome" => {platform: "WINDOWS", browser: "googlechrome"},
+            "chrome" => {platform: "WINDOWS", browser: "chrome"},
             "firefox" => {platform: "WINDOWS", browser: "firefox", browser_version: 30.0},
             "safari" => {platform: "MAC", browser: "safari", browser_version: 7},
           }.fetch(browser)
