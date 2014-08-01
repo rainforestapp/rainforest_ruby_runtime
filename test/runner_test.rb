@@ -66,6 +66,13 @@ module RainforestRubyRuntime
         end
       end
 
+      describe "select capybara error" do
+        let(:code) { format_step "raise Capybara::ElementNotFound" }
+        it "catches failled rspec assertions" do
+          subject[:status].must_equal "failed"
+        end
+      end
+
       describe "a passing spec" do
         let(:code) { format_step "expect(1).to eq(1)" }
         it "returns a 'passed'" do
