@@ -2,6 +2,11 @@ module RainforestRubyRuntime
   class Runner
     attr_reader :config_options, :logger
 
+    FAILURE_EXCEPTIONS = [
+      RSpec::Expectations::ExpectationNotMetError,
+      Capybara::ElementNotFound,
+    ].freeze
+
     def initialize(options = {})
       @config_options = options.dup.freeze
       @step_variables = options[:step_variables]
@@ -37,7 +42,7 @@ module RainforestRubyRuntime
         stdout, stderr = capture_output2 do
           run(code)
         end
-      rescue RSpec::Expectations::ExpectationNotMetError => e
+      rescue *FAILURE_EXCEPTIONS => e
         payload = exception_to_payload e, status: 'failed'
       rescue StandardError => e
         payload = exception_to_payload e, status: 'error'
