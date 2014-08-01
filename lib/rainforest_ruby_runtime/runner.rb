@@ -78,6 +78,7 @@ module RainforestRubyRuntime
         "selenium" => Drivers::Selenium,
         "sauce" => Drivers::Sauce,
         "testingbot" => Drivers::TestingBot,
+        "browser_stack" => Drivers::BrowserStack,
       }.fetch(driver)
 
       config.new(config_options).call
