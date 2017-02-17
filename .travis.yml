@@ -7,6 +7,6 @@ notifications:
     on_failure: always
 
 rvm:
-  - 2.1.1
-  
+  - 2.3.3
+
 script: bundle exec rake test
