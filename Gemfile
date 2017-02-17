@@ -6,3 +6,4 @@ gemspec
 gem 'pry'
 gem 'awesome_print'
 gem 'm'
+gem 'minitest'

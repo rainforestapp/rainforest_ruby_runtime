@@ -38,6 +38,7 @@ GEM
     method_source (0.8.2)
     mime-types (2.99.3)
     mini_portile2 (2.1.0)
+    minitest (5.10.1)
     multi_json (1.12.1)
     net-http-persistent (2.9.4)
     net-ssh (4.0.1)
@@ -107,6 +108,7 @@ DEPENDENCIES
   awesome_print
   bundler (~> 1.6)
   m
+  minitest
   pry
   rainforest_ruby_runtime!
   rake
