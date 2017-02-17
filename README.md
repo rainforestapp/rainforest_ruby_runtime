@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/rainforestapp/rainforest_ruby_runtime.svg)](https://travis-ci.org/rainforestapp/rainforest_ruby_runtime)
 
-TODO: Write a gem description
+Gem to run Rainforest Automated Tests locally or on Sauce Labs.
 
 ## Installation
 
@@ -20,7 +20,12 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+You can then run the tests using the following command:
+```
+bundle exec rainforest_test <test-file.rb>
+```
+
+To run the tests on Sauce Labs you should set the `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` environment variables.
 
 ## Contributing
 
