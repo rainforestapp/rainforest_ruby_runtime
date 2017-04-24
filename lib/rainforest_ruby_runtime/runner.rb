@@ -17,7 +17,7 @@ module RainforestRubyRuntime
     def run(code)
       logger.debug "Running code:\n#{code}\nDriver: #{driver}"
       Capybara.default_driver = :"#{driver}"
-      Capybara.default_wait_time = wait_time
+      Capybara.default_max_wait_time = wait_time
 
       apply_config!
       setup_scope_registery!
