@@ -27,7 +27,7 @@ bundle exec rainforest_test <test-file.rb>
 
 To run the tests on Sauce Labs, set the following environment variables:
 
-- `CAPYBARA_RUNTIME=sauce`
+- `CAPYBARA_DRIVER=sauce`
 - `SAUCE_USERNAME=<your username>`
 - `SAUCE_ACCESS_KEY=<your access key>`
 
