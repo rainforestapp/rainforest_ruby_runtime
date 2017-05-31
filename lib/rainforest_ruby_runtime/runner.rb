@@ -7,6 +7,8 @@ module RainforestRubyRuntime
       Capybara::ElementNotFound,
     ].freeze
 
+    TIMEOUT_IN_SECS = (ENV["TIMEOUT_IN_SECS"] || 60).freeze
+
     def initialize(options = {})
       @config_options = options.dup.freeze
       @step_variables = options[:step_variables]
@@ -26,7 +28,7 @@ module RainforestRubyRuntime
 
       test = dsl.run_code(code)
       if Test === test
-        test.run
+        safely_run(test)
       else
         raise WrongReturnValueError, test
       end
@@ -44,6 +46,8 @@ module RainforestRubyRuntime
         end
       rescue *FAILURE_EXCEPTIONS => e
         payload = exception_to_payload e, status: 'failed'
+      rescue RainforestRubyRuntime::Timeout => e
+        payload = exception_to_payload e, status: 'timeout'
       rescue StandardError => e
         payload = exception_to_payload e, status: 'error'
       rescue SyntaxError, Exception => e
@@ -145,6 +149,20 @@ module RainforestRubyRuntime
         Variables.scope_registery = Variables::Registery.new
       else
         Variables.scope_registery = Variables::StaticVariableRegistery.new(@step_variables)
+      end
+    end
+
+    private
+    # This is ensuring it is safe for us to run this in a timely fashion as we 
+    # make it timeout after a configurable amount of time
+    def safely_run(test)
+      Thread.abort_on_exception = true
+      run_thread = Thread.new { test.run }
+      start_time = Time.now.to_i
+      while run_thread.alive?
+        seconds_running = Time.now.to_i - start_time
+        raise RainforestRubyRuntime::Timeout if seconds_running > TIMEOUT_IN_SECS
+        sleep 1
       end
     end
   end

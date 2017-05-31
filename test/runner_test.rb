@@ -141,6 +141,26 @@ module RainforestRubyRuntime
           $step_variable_3_was.must_equal "some_constant"
         end
       end
+
+      describe "a long running test" do
+        let(:code) { read_sample "timeoutable" }
+        before do
+          @initial_timeout = RainforestRubyRuntime::Runner.send(:const_get, :TIMEOUT_IN_SECS)
+          RainforestRubyRuntime::Runner.send(:remove_const, :TIMEOUT_IN_SECS)
+          RainforestRubyRuntime::Runner.const_set(:TIMEOUT_IN_SECS, 1)
+        end
+
+        after do
+          RainforestRubyRuntime::Runner.send(:remove_const, :TIMEOUT_IN_SECS)
+          RainforestRubyRuntime::Runner.const_set(:TIMEOUT_IN_SECS, @initial_timeout)
+        end
+
+        it "is raising a RainforestRubyRuntime::Timeout exception" do
+          subject[:status].must_equal "timeout"
+          subject[:message].must_include "RainforestRubyRuntime::Timeout"
+          subject[:exception].must_include "RainforestRubyRuntime::Timeout"
+        end
+      end
     end
 
     describe "callbacks" do
