@@ -23,7 +23,7 @@ module RainforestRubyRuntime
             'ie10' => ["Windows 7", "Internet Explorer", "10"],
             'ie11' => ["Windows 7", "Internet Explorer", "11"],
             'chrome' => ["Windows 7", "Chrome", "35"],
-            'firefox' => ["Windows 7", "Firefox", "45"],
+            'firefox' => ["Windows 7", "Firefox", "50"],
             'safari' => ["Mavericks", "Safari", "7"],
           }.fetch(browser)
         end
@@ -31,4 +31,3 @@ module RainforestRubyRuntime
     end
   end
 end
-
