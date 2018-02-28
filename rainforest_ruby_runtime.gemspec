@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_dependency "sauce", "~> 3.7"
   spec.add_dependency "sauce-connect", "~> 3.6"
-  spec.add_dependency "rspec-expectations", "~> 3.0"
+  spec.add_dependency "rspec-expectations", "3.5.0"
   spec.add_dependency "capybara", "~> 2.7.1"
   spec.add_dependency "selenium-client", "~> 1.2.0"
   spec.add_dependency "selenium-webdriver", "~> 3.3"
