@@ -10,6 +10,7 @@ module RainforestRubyRuntime
       def call
         ::Sauce.config do |c|
           c[:browsers] = browsers
+          c[:sauce_connect_4_executable] = 'vendor/sauce/sc'
         end
       end
 
