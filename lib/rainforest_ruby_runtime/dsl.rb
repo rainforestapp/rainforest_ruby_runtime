@@ -1,11 +1,18 @@
 module RainforestRubyRuntime
   class DSL
+    include RSpec::Matchers
+    include Capybara::DSL
+
     def initialize(callback: )
       @callback = callback
     end
 
     def test(id: , title: , &block)
       RainforestRubyRuntime::Test.new(id: id, title: title, callback: @callback, &block)
+    end
+
+    def step(options, &block)
+      RainforestRubyRuntime::Step.new(options.merge(callback: @callback), &block).tap(&:run)
     end
 
     def define_variable_scope(name, &block)
@@ -15,6 +22,14 @@ module RainforestRubyRuntime
 
     def run_code(code)
       eval(code)
+    end
+
+    def method_missing(name, *args, &block)
+      if Variables.scope_registery.has_variable?(name)
+        Variables.scope_registery[name]
+      else
+        super
+      end
     end
   end
 end

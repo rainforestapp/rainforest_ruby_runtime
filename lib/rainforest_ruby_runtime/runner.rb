@@ -26,13 +26,27 @@ module RainforestRubyRuntime
 
       test = dsl.run_code(code)
       if Test === test
-        test.run
+        run_test(test)
       else
         raise WrongReturnValueError, test
       end
       test
     ensure
       terminate_session!
+    end
+
+    def run_test(test)
+      describe = RSpec.describe 'Rainforest', sauce: true, tests: [test] do
+        metadata[:tests].each do |test|
+          it test.title do
+            test.run
+          end
+        end
+      end
+
+      RSpec.configuration.reporter.report(RSpec.world.example_count([describe])) do |reporter|
+        describe.run(reporter)
+      end
     end
 
     def extract_results(code, fake_session_id: nil)
