@@ -36,7 +36,8 @@ module RainforestRubyRuntime
     end
 
     def run_test(test)
-      describe = RSpec.describe 'Rainforest', sauce: true, tests: [test] do
+      sauce = driver == 'sauce'
+      describe = RSpec.describe 'Rainforest', sauce: sauce, tests: [test] do
         metadata[:tests].each do |test|
           it test.title do
             test.run
