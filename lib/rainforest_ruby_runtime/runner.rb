@@ -39,7 +39,7 @@ module RainforestRubyRuntime
       sauce = driver == 'sauce'
       describe = RSpec.describe 'Rainforest', sauce: sauce, tests: [test] do
         metadata[:tests].each do |test|
-          it test.title do
+          it "[#{test.id}] #{test.title}" do
             test.run
           end
         end
