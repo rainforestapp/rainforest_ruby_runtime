@@ -50,39 +50,6 @@ module RainforestRubyRuntime
       end
     end
 
-    def extract_results(code, fake_session_id: nil)
-      stdout = stderr = nil
-      payload = nil
-      begin
-        stdout, stderr = capture_output2 do
-          run(code)
-        end
-      rescue *FAILURE_EXCEPTIONS => e
-        payload = exception_to_payload e, status: 'failed'
-      rescue StandardError => e
-        payload = exception_to_payload e, status: 'error'
-      rescue SyntaxError, Exception => e
-        payload = exception_to_payload e, status: 'fatal_error'
-      end
-
-      payload ||= { status: 'passed' }
-
-      sid = fake_session_id || session_id
-
-      payload = payload.merge({
-        stdout: stdout,
-        stderr: stderr,
-        session_id: sid,
-        driver: driver,
-      })
-
-
-      logger.debug("Payload")
-      logger.debug(payload.inspect)
-
-      payload
-    end
-
     def driver
       ENV.fetch("CAPYBARA_DRIVER") { "selenium" }
     end
@@ -141,17 +108,6 @@ module RainforestRubyRuntime
 
     def wait_time
       ENV.fetch("CAPYBARA_WAIT_TIME", 20).to_i
-    end
-
-    def capture_output2
-      previous_stdout, $stdout = $stdout, StringIO.new
-      previous_stderr, $stderr = $stderr, StringIO.new
-      yield
-      [$stdout.string, $stderr.string]
-    ensure
-      # Restore the previous value of stdout (typically equal to STDERR).
-      $stdout = previous_stdout
-      $stderr = previous_stderr
     end
 
     def setup_scope_registery!
