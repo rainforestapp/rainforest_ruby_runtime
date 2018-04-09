@@ -1,9 +1,12 @@
-require "bundler/gem_tasks"
+require 'bundler/gem_tasks'
 
-require 'rake/testtask'
-
-Rake::TestTask.new do |t|
-  t.pattern = "test/**/*_test.rb"
+begin
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    t.rspec_opts = '--color --format documentation'
+  end
+rescue LoadError
+  # No RSpec
 end
 
-task :default => [:test]
+task :default => [:spec]

@@ -6,7 +6,5 @@ gemspec
 
 gem 'pry'
 gem 'awesome_print'
-gem 'm', '~> 1.5.0'
-gem 'minitest', '~> 5.10.0'
 gem 'byebug'
-gem 'rspec-core', '3.5.0'
+gem 'rspec', '3.5.0'

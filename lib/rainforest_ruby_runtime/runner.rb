@@ -45,8 +45,15 @@ module RainforestRubyRuntime
         end
       end
 
-      RSpec.configuration.reporter.report(RSpec.world.example_count([describe])) do |reporter|
-        describe.run(reporter)
+      if ENV['RUNTIME_ENV'] == 'test'
+        # if we're in tests, don't mix output from here with tests output
+        # and don't include this describe block in the test count
+        describe.run
+        RSpec.world.example_groups.pop
+      else
+        RSpec.configuration.reporter.report(RSpec.world.example_count([describe])) do |reporter|
+          describe.run(reporter)
+        end
       end
     end
 

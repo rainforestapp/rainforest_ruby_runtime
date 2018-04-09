@@ -1,15 +1,21 @@
-require_relative './test_helper'
+require_relative './spec_helper'
 
 module RainforestRubyRuntime
   describe Runner do
-    subject { Runner.new }
     let(:code) { read_sample "empty" }
-    
+
+    subject { Runner.new }
+
+    before do
+      allow(subject).to receive(:driver).and_return('selenium')
+      # allow(subject).to receive(:run_test).and_return(nil)
+    end
+
     describe "#session_id" do
+      before { allow(subject).to receive(:current_driver) { OpenStruct.new(browser: OpenStruct.new(session_id: 'session')) } }
+
       it "returns a session id" do
-        subject.stub(:current_driver, OpenStruct.new(browser: OpenStruct.new(session_id: 'session'))) do
-          subject.session_id.must_equal 'session' 
-        end
+        expect(subject.session_id).to eq('session')
       end
     end
 
@@ -17,11 +23,14 @@ module RainforestRubyRuntime
       describe "with a limited browser set" do
         subject { Runner.new browsers: %w(chrome) }
 
+        before do
+          allow(subject).to receive(:driver).and_return('sauce')
+          # allow(subject).to receive(:run_test).and_return(nil)
+        end
+
         it "applies the correct configuration" do
-          subject.stub(:driver, 'sauce') do
-            subject.run(code)
-            Sauce.get_config.browsers.must_equal [["Windows 7", "Chrome", "35"]]
-          end
+          subject.send(:apply_config!)
+          expect(Sauce.get_config.browsers).to eq([['Windows 7', 'Chrome', '35']])
         end
       end
 
@@ -30,16 +39,15 @@ module RainforestRubyRuntime
 
         it "runs the content of the step" do
           test = subject.run(code)
-          test.must_be_instance_of(Test)
-          $simple_test_was.must_equal :run
+          expect(test).to be_instance_of(Test)
+          expect($simple_test_was).to eq(:run)
+          expect receive(:run_test).with(test)
         end
       end
 
       describe "for another type of test" do
         it "raises an exception" do
-          -> do
-            subject.run("")
-          end.must_raise(WrongReturnValueError)
+          expect { subject.run('') }.to raise_error(WrongReturnValueError)
         end
       end
 
@@ -48,9 +56,9 @@ module RainforestRubyRuntime
 
         it "makes the variable accessible in the test" do
           subject.run(code)
-          $step_variable_1_was.wont_be_nil
-          $step_variable_2_was.must_match(/time is: .*/)
-          $step_variable_3_was.must_equal("1")
+          expect($step_variable_1_was).to_not be_nil
+          expect($step_variable_2_was).to match(/time is: .*/)
+          expect($step_variable_3_was).to eq('1')
         end
       end
     end
@@ -86,19 +94,20 @@ module RainforestRubyRuntime
       end
 
       let(:code) { read_sample "two_steps" }
+
       subject { Runner.new callback: callback }
 
       it "calls the right method on the callback object" do
         subject.run(code)
-        callback.before_tests.size.must_equal 1
-        callback.after_tests.size.must_equal 1
-        callback.before_steps.size.must_equal 2
-        callback.after_steps.size.must_equal 2
+        expect(callback.before_tests.size).to eq(1)
+        expect(callback.after_tests.size).to eq(1)
+        expect(callback.before_steps.size).to eq(2)
+        expect(callback.after_steps.size).to eq(2)
 
-        callback.before_steps.map(&:id).must_equal [1, 2]
-        callback.after_steps.map(&:id).must_equal [1, 2]
+        expect(callback.before_steps.map(&:id)).to eq([1, 2])
+        expect(callback.after_steps.map(&:id)).to eq([1, 2])
 
-        callback.before_steps.map(&:action).must_equal ["action 1", "action 2"]
+        expect(callback.before_steps.map(&:action)).to eq(["action 1", "action 2"])
       end
 
       describe "a partially define callback object" do
@@ -107,7 +116,7 @@ module RainforestRubyRuntime
           end.new
         end
 
-        it "should not rise a method missing exception" do
+        it "should not raise a method missing exception" do
           subject.run(code)
         end
       end
