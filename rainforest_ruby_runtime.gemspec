@@ -27,5 +27,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "selenium-client", "~> 1.2.0"
   spec.add_dependency "selenium-webdriver", "~> 3.3"
   spec.add_dependency "net-http-persistent", "~> 3.0"
-  spec.add_dependency "testingbot", "~> 0.1.7"
 end
