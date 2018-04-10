@@ -4,11 +4,10 @@ module RainforestRubyRuntime
   describe Runner do
     let(:code) { read_sample "empty" }
 
-    subject { Runner.new }
+    subject { Runner.new(browsers: %w(chrome)) }
 
     before do
       allow(subject).to receive(:driver).and_return('selenium')
-      # allow(subject).to receive(:run_test).and_return(nil)
     end
 
     describe "#session_id" do
@@ -21,11 +20,8 @@ module RainforestRubyRuntime
 
     describe "#run" do
       describe "with a limited browser set" do
-        subject { Runner.new browsers: %w(chrome) }
-
         before do
           allow(subject).to receive(:driver).and_return('sauce')
-          # allow(subject).to receive(:run_test).and_return(nil)
         end
 
         it "applies the correct configuration" do
@@ -95,7 +91,7 @@ module RainforestRubyRuntime
 
       let(:code) { read_sample "two_steps" }
 
-      subject { Runner.new callback: callback }
+      subject { Runner.new(browsers: %w(chrome), callback: callback) }
 
       it "calls the right method on the callback object" do
         subject.run(code)

@@ -1,11 +1,14 @@
 module RainforestRubyRuntime
   class Runner
     attr_reader :config_options, :logger
+    attr_accessor :browser
 
     FAILURE_EXCEPTIONS = [
       RSpec::Expectations::ExpectationNotMetError,
       Capybara::ElementNotFound,
     ].freeze
+
+    BROWSERS = %w(chrome firefox ie edge safari).freeze
 
     def initialize(options = {})
       @config_options = options.dup.freeze
@@ -19,14 +22,23 @@ module RainforestRubyRuntime
       Capybara.default_driver = :"#{driver}"
       Capybara.default_max_wait_time = wait_time
 
-      apply_config!
       setup_scope_registery!
 
       dsl = RainforestRubyRuntime::DSL.new(callback: @callback)
 
       test = dsl.run_code(code)
       if Test === test
-        run_test(test)
+        if driver == 'sauce'
+          apply_config!
+          run_test(test)
+        elsif driver == 'selenium'
+          browsers = config_options[:browsers]
+          while @browser = browsers.shift
+            apply_config!
+            run_test(test)
+            terminate_session!
+          end
+        end
       else
         raise WrongReturnValueError, test
       end
@@ -83,12 +95,11 @@ module RainforestRubyRuntime
     end
 
     def apply_config!
-      config = {
-        "selenium" => Drivers::Selenium,
-        "sauce" => Drivers::Sauce,
-      }.fetch(driver)
-
-      config.new(config_options).call
+      if driver == 'selenium'
+        current_driver.options[:browser] = browser
+      elsif driver == 'sauce'
+        Drivers::Sauce.new(config_options).call
+      end
     end
 
     def current_driver

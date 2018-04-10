@@ -3,6 +3,22 @@
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "../lib")
 require 'rainforest_ruby_runtime'
 
-RainforestRubyRuntime::Runner.new(browsers: %w(firefox)).run ARGF.read
+options = {browsers: %w(chrome)}
+OptionParser.new do |opts|
+  opts.banner = "Usage: ruby rainforest_test [options] [file_paths]"
 
-puts "Your test completed successfuly!"
+  opts.on('--browsers X,Y,Z', Array, 'Browsers') do |browsers|
+    invalid_browsers = browsers - RainforestRubyRuntime::Runner::BROWSERS
+    raise OptionParser::InvalidOption, "#{invalid_browsers.join(',')}" unless invalid_browsers.empty?
+    options[:browsers] = browsers.uniq.map(&:to_sym)
+  end
+  opts.on('-h', '--help', 'Displays Help') do
+		puts opts
+		exit
+	end
+end.parse!
+
+puts "Running against #{options[:browsers].join(',')}"
+RainforestRubyRuntime::Runner.new(browsers: options[:browsers]).run ARGF.read
+
+puts "Your test completed successfully!"
