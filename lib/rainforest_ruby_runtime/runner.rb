@@ -63,6 +63,10 @@ module RainforestRubyRuntime
         describe.run
         RSpec.world.example_groups.pop
       else
+        RSpec.configure do |config|
+          config.color = true
+          config.formatter = :documentation
+        end
         RSpec.configuration.reporter.report(RSpec.world.example_count([describe])) do |reporter|
           describe.run(reporter)
         end
