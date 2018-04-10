@@ -41,7 +41,6 @@ module RainforestRubyRuntime
           tests = subject.run(codes)
           expect(tests).to all be_instance_of(Test)
           expect($simple_test_was).to eq(:run)
-          expect receive(:run_test).with(tests)
         end
       end
 
