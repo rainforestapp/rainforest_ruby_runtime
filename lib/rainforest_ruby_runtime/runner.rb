@@ -28,13 +28,31 @@ module RainforestRubyRuntime
 
       test = dsl.run_code(code)
       if Test === test
-        driver_klass.new(config_options).run(test)
+        describe = driver_klass.new(config_options).to_rspec(test)
+        run_rspec(describe)
       else
         raise WrongReturnValueError, test
       end
       test
     ensure
       terminate_session!
+    end
+
+    def run_rspec(describe)
+      if ENV['RUNTIME_ENV'] == 'test'
+        # if we're in tests, don't mix output from here with tests output
+        # and don't include this describe block in the test count
+        describe.run
+        RSpec.world.example_groups.pop
+      else
+        RSpec.configure do |config|
+          config.color = true
+          config.formatter = :documentation
+        end
+        RSpec.configuration.reporter.report(RSpec.world.example_count([describe])) do |reporter|
+          describe.run(reporter)
+        end
+      end
     end
 
     def driver_type

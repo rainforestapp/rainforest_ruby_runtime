@@ -22,8 +22,9 @@ module RainforestRubyRuntime
       describe "with a limited browser set" do
         before do
           allow(subject).to receive(:driver_type).and_return('sauce')
-          expect_any_instance_of(Drivers::Sauce).to receive(:run) do |driver|
+          expect_any_instance_of(Drivers::Sauce).to receive(:to_rspec) do |driver|
             driver.send(:apply_config)
+            double(run: nil)
           end
         end
 
