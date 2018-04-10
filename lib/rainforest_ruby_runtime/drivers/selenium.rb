@@ -7,8 +7,8 @@ module RainforestRubyRuntime
         @browsers = options[:browsers]
       end
 
-      def to_rspec(test)
-        RSpec.describe 'Rainforest', tests: [test], browsers: browsers do
+      def to_rspec(tests)
+        RSpec.describe 'Rainforest', tests: tests, browsers: browsers do
           metadata[:tests].each do |test|
             describe "[#{test.id}] #{test.title}" do
               metadata[:browsers].each do |browser|

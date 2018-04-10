@@ -19,6 +19,14 @@ OptionParser.new do |opts|
 end.parse!
 
 puts "Running against #{options[:browsers].join(',')}"
-RainforestRubyRuntime::Runner.new(browsers: options[:browsers]).run ARGF.read
+
+tests = []
+while f = ARGF.file do
+  break if f.closed?
+  tests << ARGF.read(f.size)
+  ARGF.skip
+end
+
+RainforestRubyRuntime::Runner.new(browsers: options[:browsers]).run(tests)
 
 puts "Your test completed successfully!"

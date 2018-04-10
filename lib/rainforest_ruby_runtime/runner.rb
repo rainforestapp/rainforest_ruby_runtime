@@ -17,8 +17,8 @@ module RainforestRubyRuntime
       @logger = options.fetch(:logger) { Logger.new(StringIO.new) }
     end
 
-    def run(code)
-      logger.debug "Running code:\n#{code}\nDriver: #{driver_type}"
+    def run(codes)
+      logger.debug "Running code:\n#{codes.join('\n')}\nDriver: #{driver_type}"
       Capybara.default_driver = :"#{driver_type}"
       Capybara.default_max_wait_time = wait_time
 
@@ -26,20 +26,20 @@ module RainforestRubyRuntime
 
       dsl = RainforestRubyRuntime::DSL.new(callback: @callback)
 
-      test = dsl.run_code(code)
-      if Test === test
-        describe = driver_klass.new(config_options).to_rspec(test)
+      tests = codes.map { |code| dsl.run_code(code) }
+      if tests.all? { |test| test.is_a?(Test) }
+        describe = driver_klass.new(config_options).to_rspec(tests)
         run_rspec(describe)
       else
-        raise WrongReturnValueError, test
+        raise WrongReturnValueError, tests.reject { |test| test.is_a?(Test) }
       end
-      test
+      tests
     ensure
       terminate_session!
     end
 
     def run_rspec(describe)
-      if ENV['RUNTIME_ENV'] == 'test'
+      if ENV['RUNTIME_ENV'] == 'test' && ENV['SHOW_OUTPUT'] != 'true'
         # if we're in tests, don't mix output from here with tests output
         # and don't include this describe block in the test count
         describe.run

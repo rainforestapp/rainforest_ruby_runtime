@@ -2,7 +2,7 @@ require_relative './spec_helper'
 
 module RainforestRubyRuntime
   describe Runner do
-    let(:code) { read_sample "empty" }
+    let(:codes) { [read_sample('empty')] }
 
     subject { Runner.new(browsers: %i(chrome)) }
 
@@ -29,33 +29,33 @@ module RainforestRubyRuntime
         end
 
         it "applies the correct configuration" do
-          subject.run(code)
+          subject.run(codes)
           expect(Sauce.get_config.browsers).to eq([['Windows 7', 'Chrome', 'latest']])
         end
       end
 
       describe "for a rainforest test" do
-        let(:code) { read_sample "simple" }
+        let(:codes) { [read_sample('simple')] }
 
         it "runs the content of the step" do
-          test = subject.run(code)
-          expect(test).to be_instance_of(Test)
+          tests = subject.run(codes)
+          expect(tests).to all be_instance_of(Test)
           expect($simple_test_was).to eq(:run)
-          expect receive(:run_test).with(test)
+          expect receive(:run_test).with(tests)
         end
       end
 
       describe "for another type of test" do
         it "raises an exception" do
-          expect { subject.run('') }.to raise_error(WrongReturnValueError)
+          expect { subject.run(['']) }.to raise_error(WrongReturnValueError)
         end
       end
 
       describe "with custom step variables" do
-        let(:code) { read_sample "step_variables" }
+        let(:codes) { [read_sample('step_variables')] }
 
         it "makes the variable accessible in the test" do
-          subject.run(code)
+          subject.run(codes)
           expect($step_variable_1_was).to_not be_nil
           expect($step_variable_2_was).to match(/time is: .*/)
           expect($step_variable_3_was).to eq('1')
@@ -93,12 +93,12 @@ module RainforestRubyRuntime
         end.new
       end
 
-      let(:code) { read_sample "two_steps" }
+      let(:codes) { [read_sample('two_steps')] }
 
       subject { Runner.new(browsers: %i(chrome), callback: callback) }
 
       it "calls the right method on the callback object" do
-        subject.run(code)
+        subject.run(codes)
         expect(callback.before_tests.size).to eq(1)
         expect(callback.after_tests.size).to eq(1)
         expect(callback.before_steps.size).to eq(2)
@@ -117,7 +117,7 @@ module RainforestRubyRuntime
         end
 
         it "should not raise a method missing exception" do
-          subject.run(code)
+          subject.run(codes)
         end
       end
     end

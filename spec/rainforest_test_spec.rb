@@ -2,7 +2,7 @@ require 'open3'
 require_relative './spec_helper'
 
 module RainforestRubyRuntime
-  describe 'rainforest_test' do
+  describe 'rainforest_test', show_output: true do
     subject do
       if browsers
         Open3.capture2e("ruby bin/rainforest_test #{browsers} sample_tests/empty.rb")
@@ -69,6 +69,20 @@ module RainforestRubyRuntime
           expect(status).to_not be_success
           expect(output).to match(/invalid option: --browsers opera/)
         end
+      end
+    end
+
+    context 'with multiple files' do
+      subject do
+        Open3.capture2e('ruby bin/rainforest_test sample_tests/empty.rb sample_tests/simple.rb')
+      end
+
+      it 'should work' do
+        output, status = subject
+
+        expect(status).to be_success
+        expect(output).to match(/\[1\] empty/)
+        expect(output).to match(/\[1\] My Sample Test/)
       end
     end
   end

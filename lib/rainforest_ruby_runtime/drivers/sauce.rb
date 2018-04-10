@@ -7,10 +7,10 @@ module RainforestRubyRuntime
         @options = options
       end
 
-      def to_rspec(test)
+      def to_rspec(tests)
         apply_config
 
-        RSpec.describe 'Rainforest', sauce: true, tests: [test] do
+        RSpec.describe 'Rainforest', sauce: true, tests: tests do
           metadata[:tests].each do |test|
             it "[#{test.id}] #{test.title}" do
               test.run
