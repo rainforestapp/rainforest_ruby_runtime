@@ -22,7 +22,7 @@ module RainforestRubyRuntime
       Capybara.default_driver = :"#{driver_type}"
       Capybara.default_max_wait_time = wait_time
 
-      setup_scope_registery!
+      setup_scope_registry!
 
       dsl = RainforestRubyRuntime::DSL.new(callback: @callback)
 
@@ -111,12 +111,12 @@ module RainforestRubyRuntime
       ENV.fetch("CAPYBARA_WAIT_TIME", 20).to_i
     end
 
-    def setup_scope_registery!
+    def setup_scope_registry!
       # TODO this should not be set globally, but passed in the DSL
       if @step_variables.nil?
-        Variables.scope_registery = Variables::Registery.new
+        Variables.scope_registry = Variables::Registry.new
       else
-        Variables.scope_registery = Variables::StaticVariableRegistery.new(@step_variables)
+        Variables.scope_registry = Variables::StaticVariableRegistry.new(@step_variables)
       end
     end
   end

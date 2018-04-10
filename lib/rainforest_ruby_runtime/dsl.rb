@@ -17,7 +17,7 @@ module RainforestRubyRuntime
 
     def define_variable_scope(name, &block)
       scope = Variables::Scope.new(name, &block)
-      Variables.scope_registery.register(scope)
+      Variables.scope_registry.register(scope)
     end
 
     def run_code(code)
@@ -25,12 +25,11 @@ module RainforestRubyRuntime
     end
 
     def method_missing(name, *args, &block)
-      if Variables.scope_registery.has_variable?(name)
-        Variables.scope_registery[name]
+      if Variables.scope_registry.has_variable?(name)
+        Variables.scope_registry[name]
       else
         super
       end
     end
   end
 end
-

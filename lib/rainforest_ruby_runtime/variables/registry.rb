@@ -1,6 +1,6 @@
 module RainforestRubyRuntime
   module Variables
-    class Registery
+    class Registry
       def initialize(variables = {})
         @variables = {}
       end
@@ -22,7 +22,7 @@ module RainforestRubyRuntime
       attr_reader :variables
     end
 
-    class StaticVariableRegistery
+    class StaticVariableRegistry
       def initialize(variables)
         @variables = variables.inject({}) do |variables, (name, var_and_values)|
           scope = Scope.new(name)
@@ -47,12 +47,12 @@ module RainforestRubyRuntime
       end
     end
 
-    def self.scope_registery
-      @scope_registery ||= Registery.new
+    def self.scope_registry
+      @scope_registry ||= Registry.new
     end
 
-    def self.scope_registery=(registery)
-      @scope_registery = registery
+    def self.scope_registry=(registry)
+      @scope_registry = registry
     end
   end
 end
