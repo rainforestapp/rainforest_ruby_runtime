@@ -4,7 +4,7 @@ module RainforestRubyRuntime
   describe Runner do
     let(:code) { read_sample "empty" }
 
-    subject { Runner.new(browsers: %w(chrome)) }
+    subject { Runner.new(browsers: %i(chrome)) }
 
     before do
       allow(subject).to receive(:driver).and_return('selenium')
@@ -21,12 +21,15 @@ module RainforestRubyRuntime
     describe "#run" do
       describe "with a limited browser set" do
         before do
-          allow(subject).to receive(:driver).and_return('sauce')
+          allow(subject).to receive(:driver_type).and_return('sauce')
+          expect_any_instance_of(Drivers::Sauce).to receive(:run) do |driver|
+            driver.send(:apply_config)
+          end
         end
 
         it "applies the correct configuration" do
-          subject.send(:apply_config!)
-          expect(Sauce.get_config.browsers).to eq([['Windows 7', 'Chrome', '35']])
+          subject.run(code)
+          expect(Sauce.get_config.browsers).to eq([['Windows 7', 'Chrome', 'latest']])
         end
       end
 
@@ -91,7 +94,7 @@ module RainforestRubyRuntime
 
       let(:code) { read_sample "two_steps" }
 
-      subject { Runner.new(browsers: %w(chrome), callback: callback) }
+      subject { Runner.new(browsers: %i(chrome), callback: callback) }
 
       it "calls the right method on the callback object" do
         subject.run(code)

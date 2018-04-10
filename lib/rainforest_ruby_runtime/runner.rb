@@ -18,8 +18,8 @@ module RainforestRubyRuntime
     end
 
     def run(code)
-      logger.debug "Running code:\n#{code}\nDriver: #{driver}"
-      Capybara.default_driver = :"#{driver}"
+      logger.debug "Running code:\n#{code}\nDriver: #{driver_type}"
+      Capybara.default_driver = :"#{driver_type}"
       Capybara.default_max_wait_time = wait_time
 
       setup_scope_registery!
@@ -28,17 +28,7 @@ module RainforestRubyRuntime
 
       test = dsl.run_code(code)
       if Test === test
-        if driver == 'sauce'
-          apply_config!
-          run_test(test)
-        elsif driver == 'selenium'
-          browsers = config_options[:browsers]
-          while @browser = browsers.shift
-            apply_config!
-            run_test(test)
-            terminate_session!
-          end
-        end
+        driver_klass.new(config_options).run(test)
       else
         raise WrongReturnValueError, test
       end
@@ -47,34 +37,15 @@ module RainforestRubyRuntime
       terminate_session!
     end
 
-    def run_test(test)
-      sauce = driver == 'sauce'
-      describe = RSpec.describe 'Rainforest', sauce: sauce, tests: [test] do
-        metadata[:tests].each do |test|
-          it "[#{test.id}] #{test.title}" do
-            test.run
-          end
-        end
-      end
-
-      if ENV['RUNTIME_ENV'] == 'test'
-        # if we're in tests, don't mix output from here with tests output
-        # and don't include this describe block in the test count
-        describe.run
-        RSpec.world.example_groups.pop
-      else
-        RSpec.configure do |config|
-          config.color = true
-          config.formatter = :documentation
-        end
-        RSpec.configuration.reporter.report(RSpec.world.example_count([describe])) do |reporter|
-          describe.run(reporter)
-        end
-      end
+    def driver_type
+      ENV.fetch("CAPYBARA_DRIVER") { "selenium" }
     end
 
-    def driver
-      ENV.fetch("CAPYBARA_DRIVER") { "selenium" }
+    def driver_klass
+      {
+        'selenium' => Drivers::Selenium,
+        'sauce' => Drivers::Sauce,
+      }.fetch(driver_type)
     end
 
     def current_browser
@@ -98,14 +69,6 @@ module RainforestRubyRuntime
       })
     end
 
-    def apply_config!
-      if driver == 'selenium'
-        current_driver.options[:browser] = browser
-      elsif driver == 'sauce'
-        Drivers::Sauce.new(config_options).call
-      end
-    end
-
     def current_driver
       Capybara.current_session.driver
     end
@@ -117,12 +80,12 @@ module RainforestRubyRuntime
       elsif current_driver.respond_to?(:quit)
         current_driver.quit
       else
-        logger.warn "Cannot terminate session. Driver #{driver}" and return
+        logger.warn "Cannot terminate session. Driver #{driver_type}" and return
       end
       logger.debug "Session successfuly terminated"
     rescue Selenium::WebDriver::Error::WebDriverError => e
       # Ignore
-      logger.warn "Exception while terminating session. Driver #{driver}. Class: #{e.class}"
+      logger.warn "Exception while terminating session. Driver #{driver_type}. Class: #{e.class}"
       logger.warn "#{e.message}\n#{e.backtrace.join("\n")}"
     end
 
