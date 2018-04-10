@@ -3,7 +3,7 @@
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "../lib")
 require 'rainforest_ruby_runtime'
 
-options = {browsers: %w(chrome)}
+options = {browsers: %i(chrome)}
 OptionParser.new do |opts|
   opts.banner = "Usage: ruby rainforest_test [options] [file_paths]"
 
