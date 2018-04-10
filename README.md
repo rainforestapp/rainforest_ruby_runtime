@@ -1,6 +1,6 @@
 # Rainforest Ruby Runtime
 
-[![Build Status](https://travis-ci.org/rainforestapp/rainforest_ruby_runtime.svg)](https://travis-ci.org/rainforestapp/rainforest_ruby_runtime)
+[![CircleCI](https://circleci.com/gh/rainforestapp/rainforest_ruby_runtime/tree/master.svg?style=svg)](https://circleci.com/gh/rainforestapp/rainforest_ruby_runtime/tree/master)
 
 Gem to run Rainforest Automated Tests locally or on Sauce Labs.
 
