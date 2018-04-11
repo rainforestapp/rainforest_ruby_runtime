@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-To run the tests on Sauce Labs, set the following environment variables:
+To run the tests on Sauce Labs, first run `rainforest_test --prepare-sauce`, and then set the following environment variables:
 
 - `CAPYBARA_DRIVER=sauce`
 - `SAUCE_USERNAME=<your username>`

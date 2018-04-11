@@ -3,9 +3,30 @@
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "../lib")
 require 'rainforest_ruby_runtime'
 
+def prepare_sauce
+  require 'rake'
+
+  gem_dir = __dir__
+  pwd = Dir.pwd
+
+  Dir.chdir(gem_dir)
+
+  Rake.application.init('rake', '-s')
+  Rake.application.load_rakefile
+  Rake.application[:prepare_sauce].invoke
+
+  Dir.chdir(pwd)
+end
+
 options = {browsers: %i(chrome)}
 OptionParser.new do |opts|
   opts.banner = "Usage: ruby rainforest_test [options] [file_paths]"
+
+  opts.on('--prepare-sauce', 'Sets up the Sauce Connect executable') do
+    prepare_sauce
+    puts 'Sauce Connect executable properly set up'
+    exit
+  end
 
   opts.on('--browsers X,Y,Z', Array, 'Browsers') do |browsers|
     invalid_browsers = browsers - RainforestRubyRuntime::Runner::BROWSERS
