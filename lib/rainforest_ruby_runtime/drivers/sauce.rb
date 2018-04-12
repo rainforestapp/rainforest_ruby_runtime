@@ -7,24 +7,35 @@ module RainforestRubyRuntime
         @options = options
       end
 
-      def call
-        ::Sauce.config do |c|
-          c[:browsers] = browsers
+      def to_rspec(tests)
+        apply_config
+
+        RSpec.describe 'Rainforest', sauce: true, tests: tests do
+          metadata[:tests].each do |test|
+            it "[#{test.id}] #{test.title}" do
+              test.run
+            end
+          end
         end
       end
 
       private
 
+      def apply_config
+        ::Sauce.config do |c|
+          c[:browsers] = browsers
+          c[:sauce_connect_4_executable] = File.join(RainforestRubyRuntime.root, '/vendor/sauce/sc')
+        end
+      end
+
       def browsers
         Array(options[:browsers]).map do |browser|
           {
-            'ie8' => ["Windows 7", "Internet Explorer", "8"],
-            'ie9' => ["Windows 7", "Internet Explorer", "9"],
-            'ie10' => ["Windows 7", "Internet Explorer", "10"],
-            'ie11' => ["Windows 7", "Internet Explorer", "11"],
-            'chrome' => ["Windows 7", "Chrome", "35"],
-            'firefox' => ["Windows 7", "Firefox", "50"],
-            'safari' => ["Mavericks", "Safari", "7"],
+            chrome: ['Windows 7', 'Chrome', 'latest'],
+            firefox: ['Windows 7', 'Firefox', 'latest'],
+            ie: ['Windows 7', 'Internet Explorer', 'latest'],
+            edge: ['Windows 10', 'microsoftedge', 'latest'],
+            safari: ['Mac 10.11', 'Safari', 'latest'],
           }.fetch(browser)
         end
       end

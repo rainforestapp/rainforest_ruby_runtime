@@ -10,27 +10,10 @@ module RainforestRubyRuntime
       @callback = callback
     end
 
-    def step(options, &block)
-      step = Step.new(options.merge(callback: @callback), &block)
-      @steps << step
-      step.run
-      step
-    end
-
     def run
-      extend RSpec::Matchers
-      extend Capybara::DSL
       @callback.before_test(self)
-      instance_eval &@block
+      @block.call
       @callback.after_test(self)
-    end
-
-    def method_missing(name, *args, &block)
-      if Variables.scope_registery.has_variable?(name)
-        Variables.scope_registery[name]
-      else
-        super
-      end
     end
   end
 

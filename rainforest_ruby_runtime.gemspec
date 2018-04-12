@@ -13,19 +13,30 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://www.rainforestqa.com/"
   spec.license       = "MIT"
 
-  spec.files         = `git ls-files -z`.split("\x0")
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f =~ %r(^vendor/sauce/) }
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.14"
-  spec.add_development_dependency "rake"
+  spec.post_install_message = <<-EOS
+  Thanks for installing!
+  If you plan to run scripts against Sauce Labs, please run
+  `rainforest_test --prepare-sauce`
+  and set the SAUCE_USERNAME, SAUCE_ACCESS_KEY, and CAPYBARA_DRIVER
+  environment variables.
+  EOS
+
+  spec.add_development_dependency "pry"
+  spec.add_development_dependency "byebug"
+  spec.add_development_dependency "awesome_print"
+  spec.add_development_dependency "rspec_junit_formatter"
   spec.add_dependency "sauce", "~> 3.7"
   spec.add_dependency "sauce-connect", "~> 3.6"
-  spec.add_dependency "rspec-expectations", "~> 3.0"
+  spec.add_dependency "rspec", "3.5.0"
   spec.add_dependency "capybara", "~> 2.7.1"
   spec.add_dependency "selenium-client", "~> 1.2.0"
   spec.add_dependency "selenium-webdriver", "~> 3.3"
   spec.add_dependency "net-http-persistent", "~> 3.0"
-  spec.add_dependency "testingbot", "~> 0.1.7"
+  spec.add_dependency "bundler", "~> 1.16"
+  spec.add_dependency "rake", "~> 12.3"
 end

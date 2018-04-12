@@ -1,6 +1,6 @@
 # Rainforest Ruby Runtime
 
-[![Build Status](https://travis-ci.org/rainforestapp/rainforest_ruby_runtime.svg)](https://travis-ci.org/rainforestapp/rainforest_ruby_runtime)
+[![CircleCI](https://circleci.com/gh/rainforestapp/rainforest_ruby_runtime/tree/master.svg?style=svg)](https://circleci.com/gh/rainforestapp/rainforest_ruby_runtime/tree/master)
 
 Gem to run Rainforest Automated Tests locally or on Sauce Labs.
 
@@ -18,9 +18,15 @@ Or install it yourself as:
 
     $ gem install rainforest_ruby_runtime
 
+### Installing from source
+
+    $ git clone git@github.com:rainforestapp/rainforest_ruby_runtime.git
+    $ gem build
+    $ gem install
+
 ## Usage
 
-To run the tests on Sauce Labs, set the following environment variables:
+To run the tests on Sauce Labs, first run `rainforest_test --prepare-sauce`, and then set the following environment variables:
 
 - `CAPYBARA_DRIVER=sauce`
 - `SAUCE_USERNAME=<your username>`

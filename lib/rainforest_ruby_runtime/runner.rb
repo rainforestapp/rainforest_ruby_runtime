@@ -1,11 +1,14 @@
 module RainforestRubyRuntime
   class Runner
     attr_reader :config_options, :logger
+    attr_accessor :browser
 
     FAILURE_EXCEPTIONS = [
       RSpec::Expectations::ExpectationNotMetError,
       Capybara::ElementNotFound,
     ].freeze
+
+    BROWSERS = %w(chrome firefox ie edge safari).freeze
 
     def initialize(options = {})
       @config_options = options.dup.freeze
@@ -14,62 +17,53 @@ module RainforestRubyRuntime
       @logger = options.fetch(:logger) { Logger.new(StringIO.new) }
     end
 
-    def run(code)
-      logger.debug "Running code:\n#{code}\nDriver: #{driver}"
-      Capybara.default_driver = :"#{driver}"
+    def run(codes)
+      logger.debug "Running code:\n#{codes.join('\n')}\nDriver: #{driver_type}"
+      Capybara.default_driver = :"#{driver_type}"
       Capybara.default_max_wait_time = wait_time
 
-      apply_config!
-      setup_scope_registery!
+      setup_scope_registry!
 
       dsl = RainforestRubyRuntime::DSL.new(callback: @callback)
 
-      test = dsl.run_code(code)
-      if Test === test
-        test.run
+      tests = codes.map { |code| dsl.run_code(code) }
+      if tests.all? { |test| test.is_a?(Test) }
+        describe = driver_klass.new(config_options).to_rspec(tests)
+        run_rspec(describe)
       else
-        raise WrongReturnValueError, test
+        raise WrongReturnValueError, tests.reject { |test| test.is_a?(Test) }
       end
-      test
+      tests
     ensure
       terminate_session!
     end
 
-    def extract_results(code, fake_session_id: nil)
-      stdout = stderr = nil
-      payload = nil
-      begin
-        stdout, stderr = capture_output2 do
-          run(code)
+    def run_rspec(describe)
+      if ENV['RUNTIME_ENV'] == 'test' && ENV['SHOW_OUTPUT'] != 'true'
+        # if we're in tests, don't mix output from here with tests output
+        # and don't include this describe block in the test count
+        describe.run
+        RSpec.world.example_groups.pop
+      else
+        RSpec.configure do |config|
+          config.color = true
+          config.formatter = :documentation
         end
-      rescue *FAILURE_EXCEPTIONS => e
-        payload = exception_to_payload e, status: 'failed'
-      rescue StandardError => e
-        payload = exception_to_payload e, status: 'error'
-      rescue SyntaxError, Exception => e
-        payload = exception_to_payload e, status: 'fatal_error'
+        RSpec.configuration.reporter.report(RSpec.world.example_count([describe])) do |reporter|
+          describe.run(reporter)
+        end
       end
-
-      payload ||= { status: 'passed' }
-
-      sid = fake_session_id || session_id
-
-      payload = payload.merge({
-        stdout: stdout,
-        stderr: stderr,
-        session_id: sid,
-        driver: driver,
-      })
-
-
-      logger.debug("Payload")
-      logger.debug(payload.inspect)
-
-      payload
     end
 
-    def driver
+    def driver_type
       ENV.fetch("CAPYBARA_DRIVER") { "selenium" }
+    end
+
+    def driver_klass
+      {
+        'selenium' => Drivers::Selenium,
+        'sauce' => Drivers::Sauce,
+      }.fetch(driver_type)
     end
 
     def current_browser
@@ -93,17 +87,6 @@ module RainforestRubyRuntime
       })
     end
 
-    def apply_config!
-      config = {
-        "selenium" => Drivers::Selenium,
-        "sauce" => Drivers::Sauce,
-        "testingbot" => Drivers::TestingBot,
-        "browser_stack" => Drivers::BrowserStack,
-      }.fetch(driver)
-
-      config.new(config_options).call
-    end
-
     def current_driver
       Capybara.current_session.driver
     end
@@ -115,12 +98,12 @@ module RainforestRubyRuntime
       elsif current_driver.respond_to?(:quit)
         current_driver.quit
       else
-        logger.warn "Cannot terminate session. Driver #{driver}" and return
+        logger.warn "Cannot terminate session. Driver #{driver_type}" and return
       end
       logger.debug "Session successfuly terminated"
     rescue Selenium::WebDriver::Error::WebDriverError => e
       # Ignore
-      logger.warn "Exception while terminating session. Driver #{driver}. Class: #{e.class}"
+      logger.warn "Exception while terminating session. Driver #{driver_type}. Class: #{e.class}"
       logger.warn "#{e.message}\n#{e.backtrace.join("\n")}"
     end
 
@@ -128,23 +111,12 @@ module RainforestRubyRuntime
       ENV.fetch("CAPYBARA_WAIT_TIME", 20).to_i
     end
 
-    def capture_output2
-      previous_stdout, $stdout = $stdout, StringIO.new
-      previous_stderr, $stderr = $stderr, StringIO.new
-      yield
-      [$stdout.string, $stderr.string]
-    ensure
-      # Restore the previous value of stdout (typically equal to STDERR).
-      $stdout = previous_stdout
-      $stderr = previous_stderr
-    end
-
-    def setup_scope_registery!
+    def setup_scope_registry!
       # TODO this should not be set globally, but passed in the DSL
       if @step_variables.nil?
-        Variables.scope_registery = Variables::Registery.new
+        Variables.scope_registry = Variables::Registry.new
       else
-        Variables.scope_registery = Variables::StaticVariableRegistery.new(@step_variables)
+        Variables.scope_registry = Variables::StaticVariableRegistry.new(@step_variables)
       end
     end
   end
