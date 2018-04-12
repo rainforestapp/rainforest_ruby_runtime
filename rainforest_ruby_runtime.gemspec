@@ -26,8 +26,6 @@ Gem::Specification.new do |spec|
   environment variables.
   EOS
 
-  spec.add_development_dependency "bundler", "~> 1.14"
-  spec.add_development_dependency "rake"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "awesome_print"
@@ -39,4 +37,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "selenium-client", "~> 1.2.0"
   spec.add_dependency "selenium-webdriver", "~> 3.3"
   spec.add_dependency "net-http-persistent", "~> 3.0"
+  spec.add_dependency "bundler", "~> 1.16"
+  spec.add_dependency "rake", "~> 12.3"
 end
