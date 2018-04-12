@@ -17,4 +17,7 @@ require "rainforest_ruby_runtime/variables/registry"
 require "rainforest_ruby_runtime/variables/scope"
 
 module RainforestRubyRuntime
+  def self.root
+    File.dirname(__dir__)
+  end
 end
