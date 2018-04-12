@@ -18,6 +18,12 @@ Or install it yourself as:
 
     $ gem install rainforest_ruby_runtime
 
+### Installing from source
+
+    $ git clone git@github.com:rainforestapp/rainforest_ruby_runtime.git
+    $ gem build
+    $ gem install
+
 ## Usage
 
 To run the tests on Sauce Labs, first run `rainforest_test --prepare-sauce`, and then set the following environment variables:
