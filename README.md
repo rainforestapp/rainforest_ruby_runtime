@@ -1,6 +1,6 @@
 # Rainforest Ruby Runtime
 
-[![CircleCI](https://circleci.com/gh/rainforestapp/rainforest_ruby_runtime/tree/master.svg?style=svg)](https://circleci.com/gh/rainforestapp/rainforest_ruby_runtime/tree/master)
+[![CircleCI](https://circleci.com/gh/rainforestapp/rainforest_ruby_runtime/tree/master.svg?style=svg&circle-token=8e3a287695cc26b190e8dc5a4f0c59fb747a79a6)](https://circleci.com/gh/rainforestapp/rainforest_ruby_runtime/tree/master)
 
 Gem to run Rainforest Automated Tests locally or on Sauce Labs.
 
