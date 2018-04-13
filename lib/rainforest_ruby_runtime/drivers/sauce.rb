@@ -24,7 +24,9 @@ module RainforestRubyRuntime
       def apply_config
         ::Sauce.config do |c|
           c[:browsers] = browsers
-          c[:sauce_connect_4_executable] = File.join(RainforestRubyRuntime.root, '/vendor/sauce/sc')
+          c[:sauce_connect_4_executable] = File.join(
+            RainforestRubyRuntime.root,
+            RainforestRubyRuntime.sc_executable_path)
           c[:start_local_application] = false
         end
       end

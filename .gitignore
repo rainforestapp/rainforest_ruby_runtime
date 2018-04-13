@@ -22,3 +22,4 @@ tmp
 mkmf.log
 tags
 vendor/sauce/sc
+vendor/sauce/sc.exe
