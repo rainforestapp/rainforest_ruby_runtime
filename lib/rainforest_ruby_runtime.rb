@@ -1,3 +1,5 @@
+require "rainforest_ruby_runtime/process_monkey_patch"
+
 require "sauce"
 require "sauce/capybara"
 require "rspec/expectations"
